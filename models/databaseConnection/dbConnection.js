@@ -233,4 +233,10 @@ const ingredientsArr = ingredients.map((ingredient) => ({
 //Ingredient.bulkCreate(ingredientsArr);
 //sequelize.sync();
 
-module.exports = sequelize;
+module.exports = {
+  sequelize,
+  User,
+  Recipe,
+  Ingredient,
+  RecipeIngredientAmount,
+};

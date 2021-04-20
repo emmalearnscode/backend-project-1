@@ -4,9 +4,7 @@ const userController = require("../controllers/userController.js");
 const recipeController = require("../controllers/recipeController.js");
 
 //Skapar en ny användare
-router.post("/register", (req, res) => {
-  console.log("Hello");
-});
+router.post("/register", userController.createNewUser);
 
 //Loggar in och får tillbaka en JWT
 //router.post("/auth");
