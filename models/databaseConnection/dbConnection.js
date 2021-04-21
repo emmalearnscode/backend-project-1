@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes, Op } = require("sequelize");
+const { Sequelize, DataTypes, Op, QueryInterface } = require("sequelize");
 
 const sequelize = new Sequelize({
   dialect: "sqlite",
@@ -24,6 +24,10 @@ const Ingredient = sequelize.define("Ingredient", {
 });
 
 const Recipe = sequelize.define("Recipe", {
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   instructions: {
     type: DataTypes.STRING,
     allowNull: false,

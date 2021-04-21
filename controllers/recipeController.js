@@ -8,6 +8,13 @@ const fetchIngredients = async (req, res) => {
   res.json({ ingredients: ingredients });
 };
 
+const addRecipe = async (req, res) => {
+  const recipe = req.body.recipe;
+  const response = await crud.addRecipe(recipe);
+  res.json(response);
+};
+
 module.exports = {
   fetchIngredients,
+  addRecipe,
 };

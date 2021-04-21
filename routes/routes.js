@@ -14,7 +14,7 @@ router.post("/auth", userController.loginUser);
 router.get("/ingredients", recipeController.fetchIngredients);
 
 //Skapar ett nytt recept. Endast tillgänglig för ägaren.
-//router.post("/recipes");
+router.post("/recipes", recipeController.addRecipe);
 
 //Hämtar recept paginerat.
 //Denna endpoint ska även ha en sökfunktion med hjälp av en query-param “filter”

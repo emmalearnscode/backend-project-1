@@ -72,8 +72,45 @@ async function fetchIngredients(page = 1, filter) {
   }
 }
 
+async function addRecipe(recipe) {
+  //console.log(recipe);
+  const newRecipe = await Recipe.create({
+    title: recipe.title,
+    instructions: recipe.instructions,
+    UserId: +recipe.userId,
+  });
+  recipe.ingredients.forEach(async (ingredient) => {
+    //console.log(ingredient);
+    const ingredientInfo = await Ingredient.findOne({
+      where: { item: ingredient.item },
+    });
+    const ingredientToAdd = {
+      RecipeId: newRecipe.id,
+      IngredientId: ingredientInfo.id,
+      amount: ingredient.amount,
+    };
+
+    console.log(ingredientToAdd);
+
+    const addedIngredient = await RecipeIngredientAmount.create(
+      ingredientToAdd
+    );
+    console.log(addedIngredient);
+  });
+
+  //console.log(newRecipe);
+  // RecipeIngredientAmount.create({
+  //   RecipeId: newRecipe.id,
+  //   IngredientId: ingredientInfo.id,
+  //   amount: ingredient.amount,
+  // });
+  // });
+  return { message: "Successfully added recipe" };
+}
+
 module.exports = {
   createNewUser,
   loginUser,
   fetchIngredients,
+  addRecipe,
 };
