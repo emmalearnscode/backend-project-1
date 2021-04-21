@@ -7,18 +7,18 @@ const recipeController = require("../controllers/recipeController.js");
 router.post("/register", userController.createNewUser);
 
 //Loggar in och får tillbaka en JWT
-//router.post("/auth");
+router.post("/auth", userController.loginUser);
 
 //Listar ingredienser paginerat.
 //Denna endpoint ska även ha en sökfunktion med hjälp av en query-param “filter”.
-//router.get("/ingredients");
+router.get("/ingredients", recipeController.fetchIngredients);
+
+//Skapar ett nytt recept. Endast tillgänglig för ägaren.
+//router.post("/recipes");
 
 //Hämtar recept paginerat.
 //Denna endpoint ska även ha en sökfunktion med hjälp av en query-param “filter”
 //router.get("/recipes");
-
-//Skapar ett nytt recept. Endast tillgänglig för ägaren.
-//router.post("/recipes");
 
 //Uppdaterar ett recept Endast tillgänglig för ägaren.
 //router.patch("/recipes/:id");

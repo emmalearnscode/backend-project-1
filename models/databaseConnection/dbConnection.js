@@ -1,4 +1,4 @@
-const { Sequelize, DataTypes } = require("sequelize");
+const { Sequelize, DataTypes, Op } = require("sequelize");
 
 const sequelize = new Sequelize({
   dialect: "sqlite",
@@ -235,6 +235,7 @@ const ingredientsArr = ingredients.map((ingredient) => ({
 
 module.exports = {
   sequelize,
+  Op,
   User,
   Recipe,
   Ingredient,
