@@ -12,11 +12,20 @@ router.post("/auth", userController.loginUser);
 
 //Listar ingredienser paginerat.
 //Denna endpoint ska även ha en sökfunktion med hjälp av en query-param “filter”.
-//Tar params page och filter (får alltid tillbaka 10 st resultat/page)
+//Tar query page eg page=5 (får alltid tillbaka 10 st resultat/page)
+//Tar query filter som gör en findAll som matchar
+//Tar query search som gör en findOne som gör en exakt match
 router.get("/ingredients", recipeController.fetchIngredients);
 
 //Skapar ett nytt recept. Endast tillgänglig för ägaren. Skicka med {title, instructions} i bodyn och Authorization header containing token
 router.post("/recipes", Auth.user, recipeController.addRecipe);
+
+//Lägga till ingredienser på ett recept. Endast tillgänglig för ägaren. Skicka med amount i body.
+router.post(
+  "/recipes/:recipeId/ingredients/:ingredientsId",
+  Auth.user,
+  recipeController.addIngredientsToRecipe
+);
 
 //Hämtar recept paginerat.
 //Denna endpoint ska även ha en sökfunktion med hjälp av en query-param “filter”

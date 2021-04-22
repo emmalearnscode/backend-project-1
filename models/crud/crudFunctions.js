@@ -62,10 +62,17 @@ function validateToken(token) {
   }
 }
 
-async function fetchIngredients(page = 1, filter) {
+async function fetchIngredients(page = 1, filter, search) {
   const pageLimit = 10;
   const pageOffset = page * pageLimit - pageLimit;
   //Is there a better way of doing this than running two different db requests when filter is undefined?
+  if (search) {
+    console.log(search);
+    const ingredient = await Ingredient.findOne({ where: { item: search } });
+    console.log(ingredient);
+    return ingredient;
+  }
+
   if (!filter) {
     const ingredients = await Ingredient.findAll({
       offset: pageOffset,
@@ -85,39 +92,24 @@ async function fetchIngredients(page = 1, filter) {
 }
 
 async function addRecipe(recipe) {
-  //console.log(recipe);
   const newRecipe = await Recipe.create({
     title: recipe.title,
     instructions: recipe.instructions,
     UserId: recipe.UserId,
   });
-  // recipe.ingredients.forEach(async (ingredient) => {
-  //   //console.log(ingredient);
-  //   const ingredientInfo = await Ingredient.findOne({
-  //     where: { item: ingredient.item },
-  //   });
-  //   const ingredientToAdd = {
-  //     RecipeId: newRecipe.id,
-  //     IngredientId: ingredientInfo.id,
-  //     amount: ingredient.amount,
-  //   };
 
-  //   console.log(ingredientToAdd);
-
-  //   const addedIngredient = await RecipeIngredientAmount.create(
-  //     ingredientToAdd
-  //   );
-  //   console.log(addedIngredient);
-  // });
-
-  //console.log(newRecipe);
-  // RecipeIngredientAmount.create({
-  //   RecipeId: newRecipe.id,
-  //   IngredientId: ingredientInfo.id,
-  //   amount: ingredient.amount,
-  // });
-  // });
   return { message: "Successfully added recipe" };
+}
+
+async function getOneRecipe(id) {
+  const recipe = await Recipe.findOne({ where: { id } });
+  console.log(recipe);
+  return recipe;
+}
+
+async function addIngredientsToRecipe(ingredient) {
+  const newIngredient = await RecipeIngredientAmount.create(ingredient);
+  return { message: "Ingredient added successfully" };
 }
 
 module.exports = {
@@ -126,4 +118,6 @@ module.exports = {
   validateToken,
   fetchIngredients,
   addRecipe,
+  addIngredientsToRecipe,
+  getOneRecipe,
 };
