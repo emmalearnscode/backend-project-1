@@ -9,6 +9,10 @@ const User = sequelize.define("User", {
   email: {
     type: DataTypes.STRING,
     allowNull: false,
+    unique: {
+      args: true,
+      msg: "Email already exists",
+    },
   },
   passwordHash: {
     type: DataTypes.STRING,

@@ -10,14 +10,13 @@ const {
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
-async function createNewUser(newUser) {
-  //Check that user email doesn't already exist
-  const userExists = await User.findAll({ where: { email: newUser.email } });
-  if (userExists.length > 0) {
-    return { message: `User already exists` };
-  }
+const {
+  InvalidCredentials,
+  TokenExpired,
+  Unauthorized,
+} = require("../../errors");
 
-  //Create new user
+async function createNewUser(newUser) {
   const digest = bcrypt.hashSync(newUser.password, 10);
   const user = await User.create({
     email: newUser.email,
@@ -28,26 +27,39 @@ async function createNewUser(newUser) {
 
 async function loginUser(user) {
   const currentUser = await User.findOne({ where: { email: user.email } });
+  console.log(currentUser);
   if (!currentUser) {
-    return { message: "No user exists with the current login details" };
+    throw new InvalidCredentials();
   }
   const passwordMatch = bcrypt.compareSync(
     user.password,
     currentUser.passwordHash
   );
   if (!passwordMatch) {
-    return { message: "Email or password do not match" };
+    throw new InvalidCredentials();
   }
-  const token = jwt.sign(currentUser.id, process.env.SECRET_KEY); // When I try to add expiresIn it doesn't work????
-  if (!token) {
-    return { message: "Oops! Something went wrong." };
-  }
+  const payload = { id: currentUser.id, email: currentUser.email };
+  const token = jwt.sign(payload, process.env.SECRET_KEY); // When I try to add expiresIn it doesn't work????
 
   return {
     currentUser: { email: currentUser.email, id: currentUser.id },
     token: token,
     message: "Successfully logged in",
   };
+}
+
+function validateToken(token) {
+  try {
+    return jwt.verify(token, process.env.SECRET_KEY);
+  } catch (error) {
+    if (error instanceof jwt.TokenExpiredError) {
+      throw new TokenExpired();
+    } else if (error instanceof jwt.JsonWebTokenError) {
+      throw new Unauthorized();
+    } else {
+      throw error;
+    }
+  }
 }
 
 async function fetchIngredients(page = 1, filter) {
@@ -63,7 +75,7 @@ async function fetchIngredients(page = 1, filter) {
   } else {
     const ingredients = await Ingredient.findAll({
       where: {
-        item: { [Op.substring]: filter },
+        item: { [Op.substring]: filter }, // Make this case insensitive
       },
       offset: pageOffset,
       limit: pageLimit,
@@ -77,26 +89,26 @@ async function addRecipe(recipe) {
   const newRecipe = await Recipe.create({
     title: recipe.title,
     instructions: recipe.instructions,
-    UserId: +recipe.userId,
+    UserId: recipe.UserId,
   });
-  recipe.ingredients.forEach(async (ingredient) => {
-    //console.log(ingredient);
-    const ingredientInfo = await Ingredient.findOne({
-      where: { item: ingredient.item },
-    });
-    const ingredientToAdd = {
-      RecipeId: newRecipe.id,
-      IngredientId: ingredientInfo.id,
-      amount: ingredient.amount,
-    };
+  // recipe.ingredients.forEach(async (ingredient) => {
+  //   //console.log(ingredient);
+  //   const ingredientInfo = await Ingredient.findOne({
+  //     where: { item: ingredient.item },
+  //   });
+  //   const ingredientToAdd = {
+  //     RecipeId: newRecipe.id,
+  //     IngredientId: ingredientInfo.id,
+  //     amount: ingredient.amount,
+  //   };
 
-    console.log(ingredientToAdd);
+  //   console.log(ingredientToAdd);
 
-    const addedIngredient = await RecipeIngredientAmount.create(
-      ingredientToAdd
-    );
-    console.log(addedIngredient);
-  });
+  //   const addedIngredient = await RecipeIngredientAmount.create(
+  //     ingredientToAdd
+  //   );
+  //   console.log(addedIngredient);
+  // });
 
   //console.log(newRecipe);
   // RecipeIngredientAmount.create({
@@ -111,6 +123,7 @@ async function addRecipe(recipe) {
 module.exports = {
   createNewUser,
   loginUser,
+  validateToken,
   fetchIngredients,
   addRecipe,
 };
