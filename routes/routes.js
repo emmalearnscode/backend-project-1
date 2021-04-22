@@ -39,10 +39,21 @@ router.post(
 //Uppdaterar ett recept Endast tillgänglig för ägaren.
 //router.patch("/recipes/:id");
 
-//Tar bort ett recept. Endast tillgänglig för ägaren.
+//Uppdaterar ingredienser till ett recept. Endast tillgänglig för ägaren.
+//router.patch("/recipes/:recipeId/ingredients/:ingredientsId")
+
+//Delete ingredienser till ett recept. Endast tillgänglig för ägaren.
+//router.delete("/recipes/:recipeId/ingredients/:ingredientsId")
+
+//Tar bort ett recept.
+//Tar bort även alla tillhörande ingredienser från pseudotabellen samtidigt.
+//Endast tillgänglig för ägaren.
 router.delete("/recipes/:id", Auth.user, recipeController.deleteRecipe);
 
 //Hämtar ett specifikt recept
 router.get("/recipes/:id", recipeController.getOneRecipe);
+
+//Hämtar bara ens egna recept. Endast tillgänglig för ägaren.
+//router.get("/user/:id/recipes")
 
 module.exports = router;

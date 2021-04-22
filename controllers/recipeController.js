@@ -60,6 +60,10 @@ const addIngredientsToRecipe = async (req, res, next) => {
     if (UserId != recipe.UserId) {
       throw new Unauthorized();
     }
+    const ingredientExists = await crud.getOneIngredient(IngredientId);
+    if (!ingredientExists) {
+      throw new NoResultsFound();
+    }
     const response = await crud.addIngredientsToRecipe({
       RecipeId,
       IngredientId,

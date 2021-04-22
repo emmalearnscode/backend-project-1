@@ -85,13 +85,12 @@ async function getAllIngredients(page = 1, filter) {
 }
 
 async function getOneIngredient(searchParam) {
-  console.log(searchParam);
   const ingredient = await Ingredient.findOne({
     where: {
       [Op.or]: [{ item: searchParam }, { id: searchParam }],
     },
   });
-  console.log(ingredient);
+
   return ingredient;
 }
 
