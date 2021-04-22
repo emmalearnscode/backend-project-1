@@ -14,13 +14,18 @@ router.post("/auth", userController.loginUser);
 //Denna endpoint ska även ha en sökfunktion med hjälp av en query-param “filter”.
 //Tar query page eg page=5 (får alltid tillbaka 10 st resultat/page)
 //Tar query filter som gör en findAll som matchar
-//Tar query search som gör en findOne som gör en exakt match
-router.get("/ingredients", recipeController.fetchIngredients);
+router.get("/ingredients", recipeController.getAllIngredients);
 
-//Skapar ett nytt recept. Endast tillgänglig för ägaren. Skicka med {title, instructions} i bodyn och Authorization header containing token
+//Sök efter en specifikt ingredient med namn eller id
+//Tar query item som kan vara antingen namnet eller id på varan eg ingredients/ingredient?item=Onions
+router.get("/ingredients/ingredient", recipeController.getOneIngredient);
+
+//Skapar ett nytt recept. Endast tillgänglig för ägaren.
+//Skicka med {title, instructions} i bodyn och Authorization header containing token
 router.post("/recipes", Auth.user, recipeController.addRecipe);
 
-//Lägga till ingredienser på ett recept. Endast tillgänglig för ägaren. Skicka med amount i body.
+//Lägga till ingredienser på ett recept. Endast tillgänglig för ägaren.
+//Skicka med amount i body.
 router.post(
   "/recipes/:recipeId/ingredients/:ingredientsId",
   Auth.user,
@@ -38,6 +43,6 @@ router.post(
 //router.delete("/recipes/:id");
 
 //Hämtar ett specifikt recept
-//router.get("/recipes/:id");
+router.get("/recipes/:id", recipeController.getOneRecipe);
 
 module.exports = router;

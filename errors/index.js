@@ -19,6 +19,14 @@ class InvalidCredentials extends RecipeWebsiteError {
   }
 }
 
+class InvalidQuery extends RecipeWebsiteError {
+  constructor() {
+    super();
+    this.message = `Invalid query. Please search for either itemName or itemId`;
+    this.statusCode = 400;
+  }
+}
+
 class Unauthorized extends RecipeWebsiteError {
   constructor() {
     super();
@@ -38,6 +46,7 @@ class TokenExpired extends RecipeWebsiteError {
 module.exports = {
   RecipeWebsiteError,
   InvalidBody,
+  InvalidQuery,
   InvalidCredentials,
   Unauthorized,
   TokenExpired,

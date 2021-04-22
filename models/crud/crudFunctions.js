@@ -62,17 +62,10 @@ function validateToken(token) {
   }
 }
 
-async function fetchIngredients(page = 1, filter, search) {
+async function getAllIngredients(page = 1, filter) {
   const pageLimit = 10;
   const pageOffset = page * pageLimit - pageLimit;
   //Is there a better way of doing this than running two different db requests when filter is undefined?
-  if (search) {
-    console.log(search);
-    const ingredient = await Ingredient.findOne({ where: { item: search } });
-    console.log(ingredient);
-    return ingredient;
-  }
-
   if (!filter) {
     const ingredients = await Ingredient.findAll({
       offset: pageOffset,
@@ -91,6 +84,17 @@ async function fetchIngredients(page = 1, filter, search) {
   }
 }
 
+async function getOneIngredient(searchParam) {
+  console.log(searchParam);
+  const ingredient = await Ingredient.findOne({
+    where: {
+      [Op.or]: [{ item: searchParam }, { id: searchParam }],
+    },
+  });
+  console.log(ingredient);
+  return ingredient;
+}
+
 async function addRecipe(recipe) {
   const newRecipe = await Recipe.create({
     title: recipe.title,
@@ -103,8 +107,16 @@ async function addRecipe(recipe) {
 
 async function getOneRecipe(id) {
   const recipe = await Recipe.findOne({ where: { id } });
-  console.log(recipe);
+
   return recipe;
+}
+
+async function getIngredientsForRecipe(id) {
+  const ingredients = await RecipeIngredientAmount.findAll({
+    where: { RecipeId: id },
+  });
+
+  return ingredients;
 }
 
 async function addIngredientsToRecipe(ingredient) {
@@ -116,8 +128,10 @@ module.exports = {
   createNewUser,
   loginUser,
   validateToken,
-  fetchIngredients,
+  getAllIngredients,
+  getOneIngredient,
   addRecipe,
   addIngredientsToRecipe,
   getOneRecipe,
+  getIngredientsForRecipe,
 };
