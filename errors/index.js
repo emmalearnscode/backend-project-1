@@ -35,6 +35,14 @@ class Unauthorized extends RecipeWebsiteError {
   }
 }
 
+class NoResultsFound extends RecipeWebsiteError {
+  constructor() {
+    super();
+    this.message = `Not found`;
+    this.statusCode = 404;
+  }
+}
+
 class TokenExpired extends RecipeWebsiteError {
   constructor() {
     super();
@@ -50,4 +58,5 @@ module.exports = {
   InvalidCredentials,
   Unauthorized,
   TokenExpired,
+  NoResultsFound,
 };

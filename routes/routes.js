@@ -40,7 +40,7 @@ router.post(
 //router.patch("/recipes/:id");
 
 //Tar bort ett recept. Endast tillgänglig för ägaren.
-//router.delete("/recipes/:id");
+router.delete("/recipes/:id", Auth.user, recipeController.deleteRecipe);
 
 //Hämtar ett specifikt recept
 router.get("/recipes/:id", recipeController.getOneRecipe);

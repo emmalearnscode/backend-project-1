@@ -107,7 +107,7 @@ async function addRecipe(recipe) {
 
 async function getOneRecipe(id) {
   const recipe = await Recipe.findOne({ where: { id } });
-
+  console.log(recipe);
   return recipe;
 }
 
@@ -124,6 +124,12 @@ async function addIngredientsToRecipe(ingredient) {
   return { message: "Ingredient added successfully" };
 }
 
+async function deleteRecipe(id) {
+  await Recipe.destroy({ where: { id } });
+  await RecipeIngredientAmount.destroy({ where: { RecipeId: id } });
+  return { message: "Recipe deleted successfully" };
+}
+
 module.exports = {
   createNewUser,
   loginUser,
@@ -134,4 +140,5 @@ module.exports = {
   addIngredientsToRecipe,
   getOneRecipe,
   getIngredientsForRecipe,
+  deleteRecipe,
 };

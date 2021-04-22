@@ -1,5 +1,10 @@
 const crud = require("../models/crud/crudFunctions");
-const { InvalidBody, Unauthorized, InvalidQuery } = require("../errors");
+const {
+  InvalidBody,
+  Unauthorized,
+  InvalidQuery,
+  NoResultsFound,
+} = require("../errors");
 
 const getAllIngredients = async (req, res, next) => {
   try {
@@ -71,10 +76,33 @@ const getOneRecipe = async (req, res, next) => {
   try {
     const { id } = req.params;
     const recipeResponse = await crud.getOneRecipe(id);
+    if (!recipeResponse) {
+      throw new NoResultsFound();
+    }
     const ingredientsResponse = await crud.getIngredientsForRecipe(
       recipeResponse.id
     );
     res.json({ recipe: recipeResponse, ingredients: ingredientsResponse });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const deleteRecipe = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const UserId = +req.user.id;
+    const recipe = await crud.getOneRecipe(id);
+    console.log(recipe);
+    if (!recipe) {
+      throw new NoResultsFound();
+    }
+    if (UserId != recipe.UserId) {
+      throw new Unauthorized();
+    }
+
+    const response = await crud.deleteRecipe(id);
+    res.json(response);
   } catch (error) {
     next(error);
   }
@@ -86,4 +114,5 @@ module.exports = {
   addRecipe,
   addIngredientsToRecipe,
   getOneRecipe,
+  deleteRecipe,
 };
