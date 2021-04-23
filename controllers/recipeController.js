@@ -92,6 +92,44 @@ const getOneRecipe = async (req, res, next) => {
   }
 };
 
+const getAllRecipes = async (req, res, next) => {
+  try {
+    const page = req.query.page;
+    const filter = req.query.filter;
+    const response = await crud.getAllRecipes(page, filter);
+    if (response.length === 0) {
+      throw new NoResultsFound();
+    }
+    res.json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateRecipe = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const UserId = req.user.id;
+    const { title, instructions } = req.body;
+    const fields = {};
+    if (title) fields.title = title;
+    if (instructions) fields.instructions = instructions;
+
+    const recipe = await crud.getOneRecipe(id);
+    if (!recipe) {
+      throw new NoResultsFound();
+    }
+    if (recipe.UserId !== UserId) {
+      throw new Unauthorized();
+    }
+
+    const response = await crud.updateRecipe(fields, id);
+    res.json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
 const deleteRecipe = async (req, res, next) => {
   try {
     const { id } = req.params;
@@ -112,11 +150,85 @@ const deleteRecipe = async (req, res, next) => {
   }
 };
 
+const deleteIngredientFromRecipe = async (req, res, next) => {
+  try {
+    const RecipeId = +req.params.recipeId;
+    const IngredientId = +req.params.ingredientsId;
+    const UserId = +req.user.id;
+    const recipe = await crud.getOneRecipe(RecipeId);
+    console.log(recipe);
+    if (!recipe) {
+      throw new NoResultsFound();
+    }
+    if (UserId != recipe.UserId) {
+      throw new Unauthorized();
+    }
+
+    const response = await crud.deleteIngredientsFromRecipe(
+      RecipeId,
+      IngredientId
+    );
+    res.json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const updateIngredientAmount = async (req, res, next) => {
+  try {
+    const UserId = +req.user.id;
+    const RecipeId = +req.params.recipeId;
+    const IngredientId = +req.params.ingredientsId;
+    const { amount } = req.body;
+    const recipe = await crud.getOneRecipe(RecipeId);
+    if (!recipe) {
+      throw new NoResultsFound();
+    }
+    if (UserId != recipe.UserId) {
+      throw new Unauthorized();
+    }
+    const ingredientExists = await crud.getOneIngredient(IngredientId);
+    if (!ingredientExists) {
+      throw new NoResultsFound();
+    }
+
+    const response = await crud.updateIngredientAmount(
+      RecipeId,
+      IngredientId,
+      amount
+    );
+    res.json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
+const getAllRecipesbyUser = async (req, res, next) => {
+  try {
+    const UserId = +req.user.id;
+
+    if (UserId !== +req.params.id) {
+      throw new Unauthorized();
+    }
+
+    const response = await crud.getAllRecipesbyUser(UserId);
+    console.log(response);
+    res.json(response);
+  } catch (error) {
+    next(error);
+  }
+};
+
 module.exports = {
   getAllIngredients,
   getOneIngredient,
   addRecipe,
   addIngredientsToRecipe,
   getOneRecipe,
+  getAllRecipes,
+  updateRecipe,
   deleteRecipe,
+  deleteIngredientFromRecipe,
+  updateIngredientAmount,
+  getAllRecipesbyUser,
 };
