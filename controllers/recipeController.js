@@ -21,14 +21,10 @@ const getAllIngredients = async (req, res, next) => {
 
 const getOneIngredient = async (req, res, next) => {
   try {
-    const { item } = req.query;
-    if (!item) {
-      throw new InvalidQuery();
-    }
-
+    const item = req.params.ingredient;
     const response = await crud.getOneIngredient(item);
     if (!response) {
-      res.json({ message: "Item doesn't exist" });
+      throw new NoResultsFound();
     }
     res.json(response);
   } catch (error) {

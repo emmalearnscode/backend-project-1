@@ -10,8 +10,8 @@ const Auth = require("../middlewares/auth");
 router.get("/ingredients", recipeController.getAllIngredients);
 
 //Sök efter en specifik ingredient med namn eller id
-//Tar query item som kan vara antingen namnet eller id på varan eg ingredients/ingredient?item=Onions
-router.get("/ingredients/ingredient", recipeController.getOneIngredient);
+//Tar param som kan vara antingen namnet eller id på varan eg ingredients/Onions eller ingredients/11
+router.get("/ingredients/:ingredient", recipeController.getOneIngredient);
 
 //Skapar ett nytt recept. Endast tillgänglig för ägaren.
 //Skicka med {title, instructions} i bodyn och Authorization header containing token
