@@ -1,54 +1,9 @@
-const { Sequelize, DataTypes, Op, QueryInterface } = require("sequelize");
+const { Sequelize, Op } = require("sequelize");
 
 const sequelize = new Sequelize({
   dialect: "sqlite",
   storage: "database/genericStoreDB.sqlite",
 });
-
-const User = sequelize.define("User", {
-  email: {
-    type: DataTypes.STRING,
-    allowNull: false,
-    unique: {
-      args: true,
-      msg: "Email already exists",
-    },
-  },
-  passwordHash: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-});
-
-const Ingredient = sequelize.define("Ingredient", {
-  item: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-});
-
-const Recipe = sequelize.define("Recipe", {
-  title: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  instructions: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-});
-
-Recipe.belongsTo(User);
-
-const RecipeIngredientAmount = sequelize.define("RecipeIngredientAmount", {
-  amount: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-});
-
-Recipe.belongsToMany(Ingredient, { through: RecipeIngredientAmount });
-Ingredient.belongsToMany(Recipe, { through: RecipeIngredientAmount });
 
 //User.create({ email: "test@test.com", passwordHash: "qwertyuiop123" });
 const ingredients = `Asparagus
@@ -244,8 +199,4 @@ const ingredientsArr = ingredients.map((ingredient) => ({
 module.exports = {
   sequelize,
   Op,
-  User,
-  Recipe,
-  Ingredient,
-  RecipeIngredientAmount,
 };

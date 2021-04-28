@@ -1,11 +1,8 @@
-const {
-  sequelize,
-  Op,
-  User,
-  Recipe,
-  Ingredient,
-  RecipeIngredientAmount,
-} = require("../databaseConnection/dbConnection.js");
+const { Op } = require("../databaseConnection/dbConnection.js");
+const User = require("../userModel");
+const Recipe = require("../recipeModel");
+const Ingredient = require("../ingredientModel");
+const RecipeIngredientAmount = require("../recipeIngredientAmountModel");
 
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
