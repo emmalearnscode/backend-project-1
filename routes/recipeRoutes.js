@@ -1,14 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const userController = require("../controllers/userController.js");
 const recipeController = require("../controllers/recipeController.js");
 const Auth = require("../middlewares/auth");
-
-//Skapar en ny användare. Skicka med {email, password} i body.
-router.post("/register", userController.createNewUser);
-
-//Loggar in och får tillbaka en JWT. Skicka med {email, password} i body.
-router.post("/auth", userController.loginUser);
 
 //Listar ingredienser paginerat.
 //Denna endpoint ska även ha en sökfunktion med hjälp av en query-param “filter”.
@@ -16,7 +9,7 @@ router.post("/auth", userController.loginUser);
 //Tar query filter som gör en findAll som matchar
 router.get("/ingredients", recipeController.getAllIngredients);
 
-//Sök efter en specifikt ingredient med namn eller id
+//Sök efter en specifik ingredient med namn eller id
 //Tar query item som kan vara antingen namnet eller id på varan eg ingredients/ingredient?item=Onions
 router.get("/ingredients/ingredient", recipeController.getOneIngredient);
 
