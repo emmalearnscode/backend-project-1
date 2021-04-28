@@ -13,3 +13,5 @@ const RecipeIngredientAmount = sequelize.define("RecipeIngredientAmount", {
 
 Recipe.belongsToMany(Ingredient, { through: RecipeIngredientAmount });
 Ingredient.belongsToMany(Recipe, { through: RecipeIngredientAmount });
+
+module.exports = RecipeIngredientAmount;

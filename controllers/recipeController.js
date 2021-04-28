@@ -1,17 +1,13 @@
-const crud = require("../models/crud/crudFunctions");
-const {
-  InvalidBody,
-  Unauthorized,
-  InvalidQuery,
-  NoResultsFound,
-} = require("../errors");
+//const crud = require("../models/crud/crudFunctions");
+const RecipeCrud = require("../models/crud/recipeCrud");
+const { InvalidBody, Unauthorized, NoResultsFound } = require("../errors");
 
 const getAllIngredients = async (req, res, next) => {
   try {
     const page = req.query.page;
     const filter = req.query.filter;
 
-    const ingredients = await crud.getAllIngredients(page, filter);
+    const ingredients = await RecipeCrud.getAllIngredients(page, filter);
 
     res.json({ ingredients: ingredients });
   } catch (error) {
@@ -22,7 +18,7 @@ const getAllIngredients = async (req, res, next) => {
 const getOneIngredient = async (req, res, next) => {
   try {
     const item = req.params.ingredient;
-    const response = await crud.getOneIngredient(item);
+    const response = await RecipeCrud.getOneIngredient(item);
     if (!response) {
       throw new NoResultsFound();
     }
@@ -35,11 +31,16 @@ const getOneIngredient = async (req, res, next) => {
 const addRecipe = async (req, res, next) => {
   try {
     const { title, instructions } = req.body;
+    console.log(title, instructions);
     if (!title || !instructions) {
       throw new InvalidBody(["title", "instructions"]);
     }
     const UserId = +req.user.id;
-    const response = await crud.addRecipe({ title, instructions, UserId });
+    const response = await RecipeCrud.addRecipe({
+      title,
+      instructions,
+      UserId,
+    });
     res.json(response);
   } catch (error) {
     next(error);
@@ -52,15 +53,15 @@ const addIngredientsToRecipe = async (req, res, next) => {
     const RecipeId = +req.params.recipeId;
     const IngredientId = +req.params.ingredientsId;
     const { amount } = req.body;
-    const recipe = await crud.getOneRecipe(RecipeId);
+    const recipe = await RecipeCrud.getOneRecipe(RecipeId);
     if (UserId != recipe.UserId) {
       throw new Unauthorized();
     }
-    const ingredientExists = await crud.getOneIngredient(IngredientId);
+    const ingredientExists = await RecipeCrud.getOneIngredient(IngredientId);
     if (!ingredientExists) {
       throw new NoResultsFound();
     }
-    const response = await crud.addIngredientsToRecipe({
+    const response = await RecipeCrud.addIngredientsToRecipe({
       RecipeId,
       IngredientId,
       amount,
@@ -75,13 +76,19 @@ const addIngredientsToRecipe = async (req, res, next) => {
 const getOneRecipe = async (req, res, next) => {
   try {
     const { id } = req.params;
-    const recipeResponse = await crud.getOneRecipe(id);
+
+    const recipeResponse = await RecipeCrud.getOneRecipe(id);
     if (!recipeResponse) {
       throw new NoResultsFound();
     }
-    const ingredientsResponse = await crud.getIngredientsForRecipe(
+
+    const ingredientsResponse = await RecipeCrud.getIngredientsForRecipe(
       recipeResponse.id
     );
+    if (!ingredientsResponse) {
+      throw new NoResultsFound();
+    }
+
     res.json({ recipe: recipeResponse, ingredients: ingredientsResponse });
   } catch (error) {
     next(error);
@@ -92,7 +99,7 @@ const getAllRecipes = async (req, res, next) => {
   try {
     const page = req.query.page;
     const filter = req.query.filter;
-    const response = await crud.getAllRecipes(page, filter);
+    const response = await RecipeCrud.getAllRecipes(page, filter);
     if (response.length === 0) {
       throw new NoResultsFound();
     }
@@ -111,7 +118,7 @@ const updateRecipe = async (req, res, next) => {
     if (title) fields.title = title;
     if (instructions) fields.instructions = instructions;
 
-    const recipe = await crud.getOneRecipe(id);
+    const recipe = await RecipeCrud.getOneRecipe(id);
     if (!recipe) {
       throw new NoResultsFound();
     }
@@ -119,7 +126,7 @@ const updateRecipe = async (req, res, next) => {
       throw new Unauthorized();
     }
 
-    const response = await crud.updateRecipe(fields, id);
+    const response = await RecipeCrud.updateRecipe(fields, id);
     res.json(response);
   } catch (error) {
     next(error);
@@ -130,7 +137,7 @@ const deleteRecipe = async (req, res, next) => {
   try {
     const { id } = req.params;
     const UserId = +req.user.id;
-    const recipe = await crud.getOneRecipe(id);
+    const recipe = await RecipeCrud.getOneRecipe(id);
     console.log(recipe);
     if (!recipe) {
       throw new NoResultsFound();
@@ -139,7 +146,7 @@ const deleteRecipe = async (req, res, next) => {
       throw new Unauthorized();
     }
 
-    const response = await crud.deleteRecipe(id);
+    const response = await RecipeCrud.deleteRecipe(id);
     res.json(response);
   } catch (error) {
     next(error);
@@ -151,7 +158,7 @@ const deleteIngredientFromRecipe = async (req, res, next) => {
     const RecipeId = +req.params.recipeId;
     const IngredientId = +req.params.ingredientsId;
     const UserId = +req.user.id;
-    const recipe = await crud.getOneRecipe(RecipeId);
+    const recipe = await RecipeCrud.getOneRecipe(RecipeId);
     console.log(recipe);
     if (!recipe) {
       throw new NoResultsFound();
@@ -160,7 +167,7 @@ const deleteIngredientFromRecipe = async (req, res, next) => {
       throw new Unauthorized();
     }
 
-    const response = await crud.deleteIngredientsFromRecipe(
+    const response = await RecipeCrud.deleteIngredientsFromRecipe(
       RecipeId,
       IngredientId
     );
@@ -176,19 +183,19 @@ const updateIngredientAmount = async (req, res, next) => {
     const RecipeId = +req.params.recipeId;
     const IngredientId = +req.params.ingredientsId;
     const { amount } = req.body;
-    const recipe = await crud.getOneRecipe(RecipeId);
+    const recipe = await RecipeCrud.getOneRecipe(RecipeId);
     if (!recipe) {
       throw new NoResultsFound();
     }
     if (UserId != recipe.UserId) {
       throw new Unauthorized();
     }
-    const ingredientExists = await crud.getOneIngredient(IngredientId);
+    const ingredientExists = await RecipeCrud.getOneIngredient(IngredientId);
     if (!ingredientExists) {
       throw new NoResultsFound();
     }
 
-    const response = await crud.updateIngredientAmount(
+    const response = await RecipeCrud.updateIngredientAmount(
       RecipeId,
       IngredientId,
       amount
@@ -207,7 +214,7 @@ const getAllRecipesbyUser = async (req, res, next) => {
       throw new Unauthorized();
     }
 
-    const response = await crud.getAllRecipesbyUser(UserId);
+    const response = await RecipeCrud.getAllRecipesbyUser(UserId);
     console.log(response);
     res.json(response);
   } catch (error) {

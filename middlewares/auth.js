@@ -1,5 +1,5 @@
 const { Unauthorized } = require("../errors");
-const crud = require("../models/crud/crudFunctions");
+const User = require("../models/crud/userCrud");
 
 const user = (req, res, next) => {
   const { authorization } = req.headers;
@@ -8,7 +8,7 @@ const user = (req, res, next) => {
   }
   const token = authorization.replace("Bearer ", "");
 
-  const user = crud.validateToken(token);
+  const user = User.validateToken(token);
 
   req.user = user;
   next();
